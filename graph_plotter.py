@@ -34,6 +34,8 @@ def create_graph(
     tick_rounding='auto',
     x_tick_rounding=None,
     y_tick_rounding=None,
+    ax=None,
+    save=True,
 ):
     """
     Plot one or more (x, y) series with consistent styling.
@@ -47,23 +49,13 @@ def create_graph(
     - Places the y-axis label horizontally above the top y tick.
     - Places the y-axis unit on a second line, right-aligned.
     - Formats tick labels automatically.
+    - Can create a standalone figure or draw into an existing Matplotlib axis.
 
-    Size controls:
-    - size_ticks: axis tick values
-    - size_label: x- and y-axis labels
-    - size_legend: inline legend labels
-
-    Tick rounding:
-    - tick_rounding='auto':
-        abs(value) < 1       -> up to 3 decimals
-        1 <= abs(value) < 10 -> up to 2 decimals
-        abs(value) >= 10     -> 0 decimals
-
-    - tick_rounding=2:
-        all tick labels use up to 2 decimals
-
-    - x_tick_rounding and y_tick_rounding override tick_rounding per axis.
-      They can be 'auto', an integer, or None.
+    Subplot usage:
+    - ax=None creates a new standalone figure.
+    - ax=<existing axis> draws into that axis.
+    - save=True saves the figure.
+    - save=False only draws and returns the axis.
     """
 
     # ----------------------------- validation ------------------------------------
@@ -259,17 +251,6 @@ def create_graph(
     ):
         """
         Add horizontal x- and y-axis labels with automatic positioning.
-
-        x-label:
-        - right-aligned with the final x-axis tick
-        - placed below the x-axis tick labels
-
-        y-label:
-        - horizontal
-        - unit on the next line
-        - right-aligned internally
-        - placed slightly above the top y-axis tick label
-        - placed entirely left of the visible y-axis line
         """
 
         fig.canvas.draw()
@@ -326,18 +307,10 @@ def create_graph(
         else:
             top_y_tick = axes_bbox.y1
 
-        # The left spine is moved outward by _adjust_spines(...):
-        #     spine.set_position(('outward', 35))
-        #
-        # Matplotlib gives this outward shift in points. Convert it to pixels.
         spine_outward_pt = 35
         spine_outward_px = spine_outward_pt * fig.dpi / 72
 
-        # Visible y-axis line position in pixels.
         y_axis_x_px = axes_bbox.x0 - spine_outward_px
-
-        # This point is the RIGHT EDGE of the y-label.
-        # Because ha='right', the full label extends left from here.
         y_label_right_edge_px = y_axis_x_px - y_label_gap_px
         y_label_bottom_px = top_y_tick + y_label_top_gap_px
 
@@ -509,10 +482,8 @@ def create_graph(
 
                     score = 0.0
 
-                    # Strong penalty for going outside the axes.
                     score += 1000.0 * _outside_axes_penalty(box)
 
-                    # Avoid overlap with all plotted data.
                     if len(all_points_display) > 0:
                         distances = _point_box_distance(all_points_display, box)
                         min_distance = np.min(distances)
@@ -520,14 +491,10 @@ def create_graph(
                         if min_distance < 8:
                             score += 500.0 * (8 - min_distance)
 
-                    # Avoid overlap with labels already placed.
                     for placed_box in placed_boxes:
                         score += 1000.0 * _box_overlap(box, placed_box)
 
-                    # Prefer positions near the end of the line.
                     score += rank * 2.0
-
-                    # Mildly prefer smaller offsets.
                     score += 0.01 * np.sqrt(dx**2 + dy**2)
 
                     if score < best_score:
@@ -562,7 +529,10 @@ def create_graph(
     # --------------------------- plotting core -----------------------------------
     plt.rcParams['mathtext.fontset'] = 'stix'
 
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.figure
 
     text_styles = []
 
@@ -654,6 +624,7 @@ def create_graph(
                 )
 
     # Save file
-    plt.savefig(f"{filename}.{extension}", bbox_inches='tight')
+    if save:
+        fig.savefig(f"{filename}.{extension}", bbox_inches='tight')
 
     return ax

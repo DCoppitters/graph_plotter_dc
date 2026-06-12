@@ -21,7 +21,7 @@ def create_bar_plot(
     bar_color='black',
     axis_color='black',
     text_color='black',
-    y_axis_color='black',
+    y_axis_color='lightgray',
     tick_rounding='auto',
     x_tick_rounding=None,
     value_rounding='auto',
@@ -30,6 +30,8 @@ def create_bar_plot(
     x_axis_gap_pt=18,
     x_label_gap_px=10,
     dataNotVisibleOutLimits=False,
+    ax=None,
+    save=True,
 ):
     """
     Create a clean horizontal bar plot.
@@ -45,12 +47,19 @@ def create_bar_plot(
     - Bar labels shown horizontally next to the bars.
     - Bar values shown slightly right of the end of each bar.
     - Automatic maximum x-value from the largest bar, unless overwritten.
+    - Can create a standalone figure or draw into an existing Matplotlib axis.
 
     Colour controls:
     - bar_color: bar outlines only
     - axis_color: x-axis line, x-axis tick marks, and x-axis tick labels
     - text_color: bar labels, bar values, and x-axis label
     - y_axis_color: vertical y-axis line
+
+    Subplot usage:
+    - ax=None creates a new standalone figure.
+    - ax=<existing axis> draws into that axis.
+    - save=True saves the figure.
+    - save=False only draws and returns the axis.
     """
 
     # ----------------------------- validation ------------------------------------
@@ -199,7 +208,10 @@ def create_bar_plot(
     # --------------------------- plotting core -----------------------------------
     plt.rcParams['mathtext.fontset'] = 'stix'
 
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.figure
 
     y_positions = np.arange(len(values))
 
@@ -294,6 +306,8 @@ def create_bar_plot(
         x_label_gap_px=x_label_gap_px,
     )
 
-    plt.savefig(f"{filename}.{extension}", bbox_inches='tight')
+    # Save file
+    if save:
+        fig.savefig(f"{filename}.{extension}", bbox_inches='tight')
 
     return ax

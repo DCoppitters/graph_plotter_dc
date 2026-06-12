@@ -18,4 +18,4 @@ dependencies = [
 ]
 
 [tool.setuptools]
-py-modules = ["graph_plotter"]
+py-modules = ["graph_plotter", "bar_plotter"]
