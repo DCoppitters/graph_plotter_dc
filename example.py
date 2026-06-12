@@ -23,13 +23,13 @@ legends = ['going_up', 'going_down', 'stable']
 create_graph(
     x=X,
     y=Y,
-    PLotType=['.'] * len(X),
+    PLotType=['-'] * len(X),
     legend=['going_up', 'going_down', 'stable'],
     xSymbol='Temperature',
     xUnit='C',
-    ySymbol='Money',
-    yUnit='EU',
-    filename='convergenceStdDev',
+    ySymbol='Pressure',
+    yUnit='Pa',
+    filename='result',
     extension='pdf',
 
 )
