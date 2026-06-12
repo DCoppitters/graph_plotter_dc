@@ -22,8 +22,11 @@ The main function is `create_graph`, defined in `graph_plotter.py`.
 .
 ├── graph_plotter.py
 ├── example.py
+├── README.md
 ├── requirements.txt
-└── README.md
+├── pyproject.toml
+├── LICENSE
+└── .gitignore
 ```
 
 ## Requirements
@@ -33,17 +36,47 @@ matplotlib
 numpy
 ```
 
-Install them with:
+The dependencies are listed in both `requirements.txt` and `pyproject.toml`.
+
+## Installation
+
+Clone the repository and move into the project folder:
 
 ```bash
-pip install -r requirements.txt
+git clone <repository-url>
+cd graph_plotter_dc
 ```
 
-A minimal `requirements.txt` is:
+Install the package:
 
-```text
-matplotlib
-numpy
+```bash
+pip install .
+```
+
+For development, install it in editable mode:
+
+```bash
+pip install -e .
+```
+
+Editable mode is useful when you are still changing `graph_plotter.py`. Changes in the local project folder are then used directly without reinstalling the package.
+
+After installation, the function can be imported from anywhere in the same Python environment:
+
+```python
+from graph_plotter import create_graph
+```
+
+To check whether the package is installed:
+
+```bash
+pip show graph-plotter-dc
+```
+
+To uninstall it:
+
+```bash
+pip uninstall graph-plotter-dc
 ```
 
 ## Basic usage
